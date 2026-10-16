@@ -283,3 +283,18 @@ migrate202();renderAll();
  publishAssignment186=function(rows){db.passAssignments=rows;persist186();let m=mm(),text='Passtilldelning:\n'+rows.map(x=>`${x.name}: ${x.pass}`).join('\n');db.messages.push({id:uid('msg'),author:'Passtilldelning',authorMemberId:m?.id||null,type:'pass-assignment',text,date:now()});persist186();renderHome();toast('Listan publicerades i chatten')};
  setTimeout(logoutButton,0);window.KATTERUMS_V22={version:'2.2'};
 })();
+
+/* v2.2 RC3 login reliability: clear local app marker only when Supabase has no matching session */
+(function(){
+ async function reconcileLogin22(){
+   const cloud=window.KatterumsCloud;
+   if(!cloud?.client)return;
+   const {data}=await cloud.client.auth.getSession();
+   const saved=localStorage.getItem('katterums-v2121-auth')||localStorage.getItem('katterums-v2111-auth');
+   if(saved&&!data?.session){
+     localStorage.removeItem('katterums-v2121-auth');
+     localStorage.removeItem('katterums-v2111-auth');
+   }
+ }
+ reconcileLogin22();
+})();
